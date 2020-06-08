@@ -1,18 +1,21 @@
 import React from "react";
+import Input from "../components/Input";
 import "./home.css";
 
 export default class Home extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { result: "" };
-
+    this.state = {
+      arrayScores: [],
+      inputsNotas: 4,
+      result: "",
+      input: ["+", "+"],
+    };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.addInput = this.addInput.bind(this);
+    this.makeMedia = this.makeMedia.bind(this);
   }
-
-  // handleChange(event) {
-  //   this.setState({ value: event.target.value });
-  // }
 
   handleChange(evt) {
     const value = evt.target.value;
@@ -20,11 +23,6 @@ export default class Home extends React.Component {
       ...this.state,
       [evt.target.name]: value,
     });
-    if (this.state.nota2) {
-      this.setState({ result: (this.state.nota1 + this.state.nota2) / 2 });
-    }
-    console.log(">>>>>>> evt.target.name", evt.target.name);
-    console.log(">>>>>>> this.state", this.state);
   }
 
   handleSubmit(event) {
@@ -32,36 +30,50 @@ export default class Home extends React.Component {
     event.preventDefault();
   }
 
+  makeMedia(event) {
+    event.preventDefault();
+    console.log(">>>>>>> makeMedia");
+    let notas = Object.entries(this.state).filter((key) => {
+      return key[0].includes("nota");
+    });
+
+    console.log(">>>>>>> makeMedia notas", notas);
+
+    if (notas.length > 1) {
+      console.log(">>>>>>>>>>>> notas", notas);
+      notas.reduce((sum, key) => {
+        return this.setState({
+          result: (parseFloat(sum[1]) + parseFloat(key[1])) / notas.length,
+        });
+      });
+    }
+  }
+
+  addInput(e) {
+    e.preventDefault();
+    this.setState((prevState) => ({
+      inputsNotas: prevState.inputsNotas++,
+      input: this.state.input.concat("+"),
+    }));
+  }
+
   render() {
+    let inputs = this.state.input;
     return (
       <form className="form" onSubmit={this.handleSubmit}>
-        <label>
-          Nota 1
-          <input
-            type="number"
-            name="nota1"
-            value={this.state.value}
-            onChange={this.handleChange}
-          />
-        </label>
-        <label>
-          Nota 2
-          <input
-            type="number"
-            name="nota2"
-            value={this.state.valueTwo}
-            onChange={this.handleChange}
-          />
-        </label>
-        <label>
-          Nota 3
-          <input
-            type="number"
-            name="nota3"
-            value={this.state.valueThree}
-            onChange={this.handleChange}
-          />
-        </label>
+        <button onClick={this.addInput}>Acrescente nota</button>
+        <ul className="listInputs">
+          {inputs.map((item, index) => (
+            <li key={index} className="inputs">
+              Nota {index + 1}
+              <Input
+                name={"nota" + index + 1}
+                value={this.state.value}
+                onChange={this.handleChange}
+              ></Input>
+            </li>
+          ))}
+        </ul>
         <label>
           Média
           <input
@@ -70,7 +82,7 @@ export default class Home extends React.Component {
             onChange={this.handleChange}
           />
         </label>
-        <input type="submit" value="Enviar" />
+        <input type="submit" value="Enviar" onClick={this.makeMedia} />
       </form>
     );
   }
