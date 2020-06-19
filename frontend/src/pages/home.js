@@ -6,10 +6,17 @@ export default class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      //array of input fields values
       arrayScores: [],
-      inputsNotas: 2,
+      //inputsNotas: 2,
+      //result of sum of arrayScores
       result: "",
-      input: ["+", "+"],
+      //Number os input (3 default)
+      input: ["+", "+", "+"],
+      //Is removeInputBtn disabled (default : true)
+      removeInputBtn: true,
+      //Is addInputBtn disabled (default : false)
+      addInputBtn: false,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -17,6 +24,8 @@ export default class Home extends React.Component {
     this.removeInput = this.removeInput.bind(this);
     this.makeMedia = this.makeMedia.bind(this);
   }
+
+  componentDidMount() {}
 
   handleChange(evt) {
     const value = evt.target.value;
@@ -52,21 +61,61 @@ export default class Home extends React.Component {
 
   addInput(e) {
     e.preventDefault();
-    this.setState((prevState) => ({
-      inputsNotas: prevState.inputsNotas++,
-      input: this.state.input.concat("+"),
-    }));
+    if (this.state.input.length === 8) {
+      this.setState({
+        input: this.state.input.concat("+"),
+        addInputBtn: true,
+      });
+      return;
+    } else {
+      this.setState((prevState) => ({
+        addInputBtn: false,
+        removeInputBtn: false,
+        //inputsNotas: prevState.inputsNotas++,
+        input: this.state.input.concat("+"),
+      }));
+    }
   }
 
   removeInput(e) {
     e.preventDefault();
-    let stateInput = this.state.input;
-    this.state.input.pop();
-    this.setState((prevState) => ({
-      inputsNotas: prevState.inputsNotas--,
-      input: stateInput,
-    }));
-    console.log(">>>>>>>>>>>> this.state.input", this.state.input);
+
+    if (this.state.input.length > 3 && this.state.input.length < 8) {
+      let stateInput = this.state.input;
+      this.state.input.pop();
+      this.setState((prevState) => ({
+        addInputBtn: false,
+        removeInputBtn: false,
+        //inputsNotas: prevState.inputsNotas--,
+        input: stateInput,
+      }));
+    }
+    if (this.state.input.length === 8) {
+      let stateInput = this.state.input;
+      this.state.input.pop();
+      this.setState((prevState) => ({
+        addInputBtn: false,
+        removeInputBtn: false,
+        //inputsNotas: prevState.inputsNotas--,
+        input: stateInput,
+      }));
+    }
+    if (this.state.input.length > 8) {
+      let stateInput = this.state.input;
+      this.state.input.pop();
+      this.setState((prevState) => ({
+        addInputBtn: false,
+        removeInputBtn: false,
+        //inputsNotas: prevState.inputsNotas--,
+        input: stateInput,
+      }));
+    }
+    if (this.state.input.length <= 3) {
+      this.setState({
+        addInputBtn: false,
+        removeInputBtn: true,
+      });
+    }
   }
 
   render() {
@@ -74,22 +123,30 @@ export default class Home extends React.Component {
     return (
       <form className="form" onSubmit={this.handleSubmit}>
         <div className="inputsContainer">
-          <button className="removeInput" onClick={this.removeInput}>
+          <button
+            disabled={this.state.removeInputBtn}
+            className="removeInput"
+            onClick={this.removeInput}
+          >
             <span>-</span>
           </button>
           <ul className="listInputs">
             {inputs.map((item, index) => (
               <li key={index} className="inputs">
-                Nota {index + 1}
                 <Input
-                  name={"nota" + index + 1}
+                  name={"nota" + (index + 1)}
                   value={this.state.value}
                   onChange={this.handleChange}
+                  placeholder={"nota" + (index + 1)}
                 ></Input>
               </li>
             ))}
           </ul>
-          <button className="addInput" onClick={this.addInput}>
+          <button
+            disabled={this.state.addInputBtn}
+            className="addInput"
+            onClick={this.addInput}
+          >
             <span>+</span>
           </button>
         </div>
